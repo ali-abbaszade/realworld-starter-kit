@@ -39,13 +39,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "debug_toolbar",
     "rest_framework",
     "rest_framework.authtoken",
     "dj_rest_auth",
-    "accounts",
+    "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -128,6 +130,11 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
@@ -136,4 +143,8 @@ REST_FRAMEWORK = {
 
 SITE_ID = 1
 
-AUTH_USER_MODEL = "accounts.CustomUser"
+AUTH_USER_MODEL = "users.CustomUser"
+
+REST_AUTH = {
+    "LOGIN_SERIALIZER": "users.serializers.CustomLoginSerializer",
+}
