@@ -7,9 +7,9 @@ name = "pypi"
 django = "*"
 djangorestframework = "*"
 python-decouple = "*"
-dj-rest-auth = "*"
 pillow = "*"
 django-debug-toolbar = "*"
+djoser = "*"
 
 [dev-packages]
 

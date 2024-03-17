@@ -1,15 +1,13 @@
 from rest_framework.response import Response
-from dj_rest_auth.views import LoginView
-from .serializers import UserSerializer, LoginSerializer
+from rest_framework import status
+from djoser.views import TokenCreateView
+from djoser import utils
+
+from .serializers import UserSerializer
 
 
-class CustomLoginView(LoginView):
-
-    def post(self, request, *args, **kwargs):
-        self.request = request
-        self.serializer = self.get_serializer(data=self.request.data)
-        self.serializer.is_valid(raise_exception=True)
-
-        self.login()
-        serializer = UserSerializer(self.request.user)
-        return Response(serializer.data)
+class CustomTokenCreateView(TokenCreateView):
+    def _action(self, serializer):
+        utils.login_user(self.request, serializer.user)
+        user_serializer = UserSerializer(serializer.user)
+        return Response(user_serializer.data, status=status.HTTP_200_OK)

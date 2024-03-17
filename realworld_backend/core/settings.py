@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "rest_framework",
     "rest_framework.authtoken",
-    "dj_rest_auth",
+    "djoser",
     "users.apps.UsersConfig",
 ]
 
@@ -141,10 +141,5 @@ REST_FRAMEWORK = {
     ),
 }
 
-SITE_ID = 1
 
 AUTH_USER_MODEL = "users.CustomUser"
-
-REST_AUTH = {
-    "LOGIN_SERIALIZER": "users.serializers.CustomLoginSerializer",
-}
