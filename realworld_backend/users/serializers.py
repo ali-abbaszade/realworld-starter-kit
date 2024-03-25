@@ -1,6 +1,13 @@
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+from djoser.serializers import UserCreateSerializer
+
 from .models import CustomUser
+
+
+class CustomUserCreateSerializer(UserCreateSerializer):
+    class Meta(UserCreateSerializer.Meta):
+        fields = ("username", "email", "password")
 
 
 class UserSerializer(serializers.ModelSerializer):

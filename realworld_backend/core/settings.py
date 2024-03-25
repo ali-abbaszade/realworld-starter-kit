@@ -143,3 +143,10 @@ REST_FRAMEWORK = {
 
 
 AUTH_USER_MODEL = "users.CustomUser"
+
+DJOSER = {
+    "SERIALIZERS": {
+        "user_create": "users.serializers.CustomUserCreateSerializer",
+        "user": "users.serializers.UserSerializer",
+    }
+}
