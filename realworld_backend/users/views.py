@@ -1,7 +1,11 @@
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from djoser.views import TokenCreateView, UserViewSet
 from djoser import utils
+
+from django.contrib.auth import get_user_model
 
 from .serializers import UserSerializer
 
@@ -20,3 +24,12 @@ class CustomUserViewSet(UserViewSet):
         user = serializer.save()
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    User = get_user_model()
+    user = User.objects.get(pk=request.user.id)
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
