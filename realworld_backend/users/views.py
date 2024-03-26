@@ -26,10 +26,16 @@ class CustomUserViewSet(UserViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@api_view()
+@api_view(["GET", "PUT"])
 @permission_classes([IsAuthenticated])
 def current_user(request):
     User = get_user_model()
     user = User.objects.get(pk=request.user.id)
-    serializer = UserSerializer(user)
-    return Response(serializer.data)
+    if request.method == "GET":
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+    elif request.method == "PUT":
+        serializer = UserSerializer(instance=user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
