@@ -1,8 +1,11 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from djoser.serializers import UserCreateSerializer
 
 from .models import CustomUser
+
+User = get_user_model()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -18,5 +21,16 @@ class UserSerializer(serializers.ModelSerializer):
         return token.key
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ("email", "token", "username", "bio", "image")
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    following = serializers.SerializerMethodField()
+
+    def get_following(self, user):
+        return user.followers.exists()
+
+    class Meta:
+        model = User
+        fields = ("username", "bio", "image", "following")

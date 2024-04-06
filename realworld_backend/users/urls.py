@@ -1,11 +1,11 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 
-
 from . import views
 
 router = DefaultRouter()
 router.register("users", views.CustomUserViewSet)
+router.register("profiles", views.ProfileViewSet, basename="profiles")
 
 urlpatterns = [
     path("users/login/", views.CustomTokenCreateView.as_view(), name="login"),

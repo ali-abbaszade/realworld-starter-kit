@@ -8,6 +8,13 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     bio = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="users/", null=True)
+    followers = models.ManyToManyField("self", symmetrical=False)
+
+    def count_followers(self):
+        return self.followers.count()
+
+    def count_following(self):
+        return CustomUser.objects.filter(followers=self).count()
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
