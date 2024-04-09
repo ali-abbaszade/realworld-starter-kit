@@ -8,13 +8,6 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     bio = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="users/", null=True)
-    followers = models.ManyToManyField("self", symmetrical=False)
-
-    def count_followers(self):
-        return self.followers.count()
-
-    def count_following(self):
-        return CustomUser.objects.filter(followers=self).count()
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -23,3 +16,20 @@ class CustomUser(AbstractUser):
 
     def __str__(self) -> str:
         return self.email
+
+
+class Follow(models.Model):
+    follower = models.ForeignKey(
+        CustomUser, related_name="following", on_delete=models.CASCADE
+    )
+    following = models.ForeignKey(
+        CustomUser, related_name="followers", on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["follower", "following"], name="unique following"
+            )
+        ]

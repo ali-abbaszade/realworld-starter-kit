@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from djoser.serializers import UserCreateSerializer
 
-from .models import CustomUser
+from .models import Follow
 
 User = get_user_model()
 
@@ -28,8 +28,11 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     following = serializers.SerializerMethodField()
 
-    def get_following(self, user):
-        return user.followers.exists()
+    def get_following(self, target_user):
+        user = self.context.get("user")
+        return Follow.objects.filter(
+            follower_id=user.id, following_id=target_user.id
+        ).exists()
 
     class Meta:
         model = User

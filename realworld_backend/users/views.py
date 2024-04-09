@@ -1,16 +1,15 @@
 from rest_framework.decorators import api_view, permission_classes, action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from djoser.views import TokenCreateView, UserViewSet
 from djoser import utils
 
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-
 from .serializers import UserSerializer, ProfileSerializer
-
+from .models import Follow
 
 User = get_user_model()
 
@@ -45,18 +44,49 @@ def current_user(request):
         return Response(serializer.data)
 
 
-class ProfileViewSet(viewsets.ModelViewSet):
+class ProfileViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = User.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
+    lookup_field = "username"
+
+    def get_serializer_context(self):
+        return {"user": self.request.user}
 
     @action(
         methods=["get"],
         detail=False,
-        permission_classes=[IsAuthenticated],
         url_path="(?P<username>\\w+)",
     )
     def retrieve_by_username(self, request, username):
         user = get_object_or_404(User, username=username)
-        data = ProfileSerializer(user, context={"request": request}).data
+        data = ProfileSerializer(user, context={"user": self.request.user}).data
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(
+        methods=["post", "get"],
+        detail=True,
+        url_path="follow",
+    )
+    def follow_user(self, request, username=None):
+        target_user = self.get_object()
+        if target_user.id == self.request.user.id:
+            return Response(
+                "Invalid follow request", status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            Follow.objects.create(
+                follower_id=self.request.user.id,
+                following_id=target_user.id,
+            )
+            serializer = ProfileSerializer(
+                target_user, context={"user": self.request.user}
+            )
+            return Response(serializer.data)
+        except:
+            return Response(f"You have already followed {target_user.username}.")
