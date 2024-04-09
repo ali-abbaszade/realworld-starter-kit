@@ -69,11 +69,11 @@ class ProfileViewSet(
         return Response(data, status=status.HTTP_200_OK)
 
     @action(
-        methods=["post", "get"],
+        methods=["get"],
         detail=True,
         url_path="follow",
     )
-    def follow_user(self, request, username=None):
+    def follow_unfollow_user(self, request, username=None):
         target_user = self.get_object()
         if target_user.id == self.request.user.id:
             return Response(
@@ -89,4 +89,11 @@ class ProfileViewSet(
             )
             return Response(serializer.data)
         except:
-            return Response(f"You have already followed {target_user.username}.")
+            follow = get_object_or_404(
+                Follow, follower_id=self.request.user.id, following_id=target_user.id
+            )
+            follow.delete()
+            serializer = ProfileSerializer(
+                target_user, context={"user": self.request.user}
+            )
+            return Response(serializer.data)
