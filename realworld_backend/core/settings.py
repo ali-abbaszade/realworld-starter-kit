@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "djoser",
     "users.apps.UsersConfig",
+    "articles.apps.ArticlesConfig",
 ]
 
 MIDDLEWARE = [
