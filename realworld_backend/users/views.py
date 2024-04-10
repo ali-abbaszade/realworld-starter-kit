@@ -69,26 +69,30 @@ class ProfileViewSet(
         return Response(data, status=status.HTTP_200_OK)
 
     @action(
-        methods=["get"],
+        methods=["delete", "post"],
         detail=True,
         url_path="follow",
     )
     def follow_unfollow_user(self, request, username=None):
         target_user = self.get_object()
-        if target_user.id == self.request.user.id:
-            return Response(
-                "Invalid follow request", status=status.HTTP_400_BAD_REQUEST
-            )
-        try:
-            Follow.objects.create(
-                follower_id=self.request.user.id,
-                following_id=target_user.id,
-            )
-            serializer = ProfileSerializer(
-                target_user, context={"user": self.request.user}
-            )
-            return Response(serializer.data)
-        except:
+        if self.request.method == "POST":
+            if target_user.id == self.request.user.id:
+                return Response(
+                    "Invalid follow request", status=status.HTTP_400_BAD_REQUEST
+                )
+            try:
+                Follow.objects.create(
+                    follower_id=self.request.user.id,
+                    following_id=target_user.id,
+                )
+                serializer = ProfileSerializer(
+                    target_user, context={"user": self.request.user}
+                )
+                return Response(serializer.data)
+            except:
+                return Response(f"You already followed {target_user.username}.")
+
+        elif self.request.method == "DELETE":
             follow = get_object_or_404(
                 Follow, follower_id=self.request.user.id, following_id=target_user.id
             )
