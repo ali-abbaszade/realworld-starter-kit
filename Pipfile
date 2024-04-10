@@ -10,6 +10,7 @@ python-decouple = "*"
 pillow = "*"
 django-debug-toolbar = "*"
 djoser = "*"
+django-taggit = "*"
 
 [dev-packages]
 

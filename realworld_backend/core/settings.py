@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
+    "taggit",
     "users.apps.UsersConfig",
     "articles.apps.ArticlesConfig",
 ]
@@ -156,3 +157,6 @@ DJOSER = {
         "user": "users.serializers.UserSerializer",
     }
 }
+
+# Taggit config
+TAGGIT_CASE_INSENSITIVE = True

@@ -25,6 +25,7 @@ urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
     path("admin/", admin.site.urls),
     path("api/", include("users.urls")),
+    path("api/", include("articles.urls")),
 ]
 
 if settings.DEBUG:
