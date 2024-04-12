@@ -12,6 +12,7 @@ from .pagination import CustomLimitOffsetPagination
 class ArticleViewSet(ModelViewSet):
     serializer_class = ArticleSerializer
     pagination_class = CustomLimitOffsetPagination
+    lookup_field = "slug"
 
     def get_queryset(self):
         queryset = Article.objects.all()
@@ -39,7 +40,6 @@ class ArticleViewSet(ModelViewSet):
         followed_users = Follow.objects.filter(follower=current_user).values_list(
             "following", flat=True
         )
-        print(followed_users)
         queryset = queryset.filter(author__in=followed_users)
         serializer = ArticleSerializer(
             queryset, many=True, context={"user": current_user}
