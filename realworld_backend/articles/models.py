@@ -9,7 +9,7 @@ User = get_user_model()
 
 class Article(models.Model):
     title = models.CharField(max_length=255)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     body = models.TextField()
     tags = TaggableManager()

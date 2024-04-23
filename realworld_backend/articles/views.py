@@ -1,5 +1,5 @@
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -11,6 +11,7 @@ from .pagination import CustomLimitOffsetPagination
 
 class ArticleViewSet(ModelViewSet):
     serializer_class = ArticleSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = CustomLimitOffsetPagination
     lookup_field = "slug"
 
