@@ -1,3 +1,5 @@
+from django.utils.text import slugify
+
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -33,6 +35,20 @@ class ArticleViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {"user": self.request.user}
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if request.data.get("title"):
+            title = request.data["title"]
+            slug = slugify(title)
+            instance.slug = slug
+
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def feed(self, request):
