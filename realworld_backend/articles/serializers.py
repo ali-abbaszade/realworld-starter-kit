@@ -2,7 +2,7 @@ from django.utils.text import slugify
 from rest_framework import serializers
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
-from .models import Article
+from .models import Article, Comment
 from users.serializers import ProfileSerializer
 
 
@@ -45,3 +45,18 @@ class ArticleSerializer(TaggitSerializer, serializers.ModelSerializer):
         instance = Article.objects.create(author=user, slug=slug, **validated_data)
         instance.tags.add(*tags)
         return instance
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ("id", "created_at", "updated_at", "body", "author")
+
+    def create(self, validated_data):
+        article_id = self.context["article_id"]
+        author_id = self.context["author_id"]
+        return Comment.objects.create(
+            article_id=article_id, author_id=author_id, **validated_data
+        )

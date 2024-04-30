@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Article, Favorite
+from .models import Article, Favorite, Comment
 
 
 @admin.register(Article)
@@ -15,3 +15,6 @@ class ArticleAdmin(admin.ModelAdmin):
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ["article", "username"]
+
+
+admin.site.register(Comment)

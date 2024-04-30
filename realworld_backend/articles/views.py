@@ -1,13 +1,14 @@
 from django.utils.text import slugify
 
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Article
+from .models import Article, Comment
 from users.models import Follow
-from .serializers import ArticleSerializer
+from .serializers import ArticleSerializer, CommentSerializer
 from .pagination import CustomLimitOffsetPagination
 
 
@@ -62,3 +63,34 @@ class ArticleViewSet(ModelViewSet):
             queryset, many=True, context={"user": current_user}
         )
         return Response(serializer.data)
+
+
+class CommentViewSet(ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Comment.objects.filter(article__slug=self.kwargs["article_slug"])
+
+    def get_serializer_context(self):
+        article = Article.objects.get(slug=self.kwargs["article_slug"])
+        return {
+            "article_id": article.id,
+            "author_id": self.request.user.id,
+            "user": self.request.user,
+        }
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED, headers=headers
+            )
+        except:
+            return Response(
+                "You submitted a comment for this article.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
