@@ -5,7 +5,12 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.mixins import (
+    CreateModelMixin,
+    ListModelMixin,
+    DestroyModelMixin,
+    RetrieveModelMixin,
+)
 
 from .models import Article, Comment
 from users.models import Follow
@@ -66,7 +71,13 @@ class ArticleViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
-class CommentViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
+class CommentViewSet(
+    CreateModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    GenericViewSet,
+):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
