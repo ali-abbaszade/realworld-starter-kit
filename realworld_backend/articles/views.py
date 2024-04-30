@@ -4,7 +4,8 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.mixins import CreateModelMixin, ListModelMixin
 
 from .models import Article, Comment
 from users.models import Follow
@@ -65,9 +66,9 @@ class ArticleViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
-class CommentViewSet(ModelViewSet):
+class CommentViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         return Comment.objects.filter(article__slug=self.kwargs["article_slug"])
