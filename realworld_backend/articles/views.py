@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import (
     CreateModelMixin,
@@ -13,8 +14,9 @@ from rest_framework.mixins import (
 )
 
 from .models import Article, Comment, Favorite
+from taggit.models import Tag
 from users.models import Follow
-from .serializers import ArticleSerializer, CommentSerializer
+from .serializers import ArticleSerializer, CommentSerializer, TagSerializer
 from .pagination import CustomLimitOffsetPagination
 
 
@@ -133,3 +135,14 @@ class CommentViewSet(
                 {"error": "You submitted a comment for this article."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class TagList(ListAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        tags = [item.name for item in queryset]
+        serializer = TagSerializer({"tags": tags})
+        return Response(serializer.data)

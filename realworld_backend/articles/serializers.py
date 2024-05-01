@@ -60,3 +60,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return Comment.objects.create(
             article_id=article_id, author_id=author_id, **validated_data
         )
+
+
+class TagSerializer(serializers.Serializer):
+    tags = serializers.ListField(child=serializers.CharField())
