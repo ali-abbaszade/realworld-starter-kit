@@ -12,7 +12,7 @@ from rest_framework.mixins import (
     RetrieveModelMixin,
 )
 
-from .models import Article, Comment
+from .models import Article, Comment, Favorite
 from users.models import Follow
 from .serializers import ArticleSerializer, CommentSerializer
 from .pagination import CustomLimitOffsetPagination
@@ -70,6 +70,19 @@ class ArticleViewSet(ModelViewSet):
         )
         return Response(serializer.data)
 
+    @action(detail=True, methods=["get", "post"], permission_classes=[IsAuthenticated])
+    def favorite(self, request, slug):
+        article = Article.objects.get(slug=self.kwargs["slug"])
+        try:
+            Favorite.objects.create(user=self.request.user, article=article)
+            serializer = ArticleSerializer(article, context={"user": self.request.user})
+            return Response(serializer.data)
+        except:
+            return Response(
+                {"error": "This article was added to favorites before."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
 
 class CommentViewSet(
     CreateModelMixin,
@@ -103,6 +116,6 @@ class CommentViewSet(
             )
         except:
             return Response(
-                "You submitted a comment for this article.",
+                {"error": "You submitted a comment for this article."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
