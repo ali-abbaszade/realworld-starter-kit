@@ -70,18 +70,32 @@ class ArticleViewSet(ModelViewSet):
         )
         return Response(serializer.data)
 
-    @action(detail=True, methods=["get", "post"], permission_classes=[IsAuthenticated])
+    @action(
+        detail=True,
+        methods=["get", "post", "delete"],
+        permission_classes=[IsAuthenticated],
+    )
     def favorite(self, request, slug):
-        article = Article.objects.get(slug=self.kwargs["slug"])
-        try:
-            Favorite.objects.create(user=self.request.user, article=article)
+        article = self.get_object()
+        if request.method == "POST":
+            try:
+                Favorite.objects.create(user=self.request.user, article=article)
+                serializer = ArticleSerializer(
+                    article, context={"user": self.request.user}
+                )
+                return Response(serializer.data)
+            except:
+                return Response(
+                    {"error": "This article was added to favorites before."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        elif request.method == "DELETE":
+            Favorite.objects.filter(user=self.request.user, article=article).delete()
             serializer = ArticleSerializer(article, context={"user": self.request.user})
             return Response(serializer.data)
-        except:
-            return Response(
-                {"error": "This article was added to favorites before."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        elif request.method == "GET":
+            serializer = ArticleSerializer(article, context={"user": self.request.user})
+            return Response(serializer.data)
 
 
 class CommentViewSet(
