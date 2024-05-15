@@ -12,6 +12,8 @@ django-debug-toolbar = "*"
 djoser = "*"
 django-taggit = "*"
 drf-nested-routers = "*"
+pytest = "*"
+pytest-django = "*"
 
 [dev-packages]
 
