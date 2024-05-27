@@ -12,10 +12,11 @@ django-debug-toolbar = "*"
 djoser = "*"
 django-taggit = "*"
 drf-nested-routers = "*"
-pytest = "*"
-pytest-django = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-django = "*"
+model-bakery = "*"
 
 [requires]
 python_version = "3.12"
