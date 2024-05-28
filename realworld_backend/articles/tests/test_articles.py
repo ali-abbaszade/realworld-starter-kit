@@ -30,3 +30,16 @@ def test_list_articles_filter_by_author_returns_200():
 
     assert response.status_code == 200
     assert response.data["results"][0]["author"]["username"] == article.author.username
+
+
+@pytest.mark.django_db
+def test_list_articles_filter_by_favorited_returns_200():
+    user = baker.make(User)
+    article = baker.make(models.Article)
+    favorite = baker.make(models.Favorite, user=user, article=article)
+
+    client = APIClient()
+    response = client.get(f"/api/articles?favorited={user.username}", follow=True)
+
+    assert response.status_code == 200
+    assert response.data["results"][0]["favorites_count"] == 1
