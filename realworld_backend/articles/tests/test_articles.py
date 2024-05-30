@@ -182,3 +182,50 @@ def test_delete_article_authenticated_user_returns_204():
     response = client.delete(f"/api/articles/{article.slug}/")
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.django_db
+def test_favorite_article_anonymous_returns_401():
+    article = baker.make(models.Article)
+
+    client = APIClient()
+    response = client.post(f"/api/articles/{article.slug}/favorite/")
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
+def test_favorite_article_authenticated_user_returns_200():
+    article = baker.make(models.Article)
+    user = baker.make(User)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    response = client.post(f"/api/articles/{article.slug}/favorite/")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["favorited"] == True
+    assert response.data["slug"] == article.slug
+    assert response.data["title"] == article.title
+
+
+@pytest.mark.django_db
+def test_unfavorite_article_anonymous_returns_401():
+    article = baker.make(models.Article)
+
+    client = APIClient()
+    response = client.delete(f"/api/articles/{article.slug}/favorite/")
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
+def test_unfavorite_article_authenticated_user_returns_200():
+    article = baker.make(models.Article)
+    user = baker.make(User)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    response = client.delete(f"/api/articles/{article.slug}/favorite/")
+
+    assert response.status_code == status.HTTP_200_OK
