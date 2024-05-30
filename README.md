@@ -13,11 +13,30 @@ We've gone to great lengths to adhere to the **Django Rest Framework** community
 For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
 
 
-# How it works
+## Setup
 
-> Describe the general architecture of your app here
+**Clone the repository**
+```
+git clone https://github.com/ali-abbaszade/realworld-starter-kit.git
+```
 
-# Getting started
+**Install pipenv**
+```
+pip install pipenv
+```
 
-> npm install, npm start, etc.
+**Create a virtual environment and install dependencies**
 
+```
+pipenv install
+```
+
+**Activate the virtual environment**
+```
+pipenv shell
+```
+
+**Running the application**
+```
+python manage.py runserver
+```
