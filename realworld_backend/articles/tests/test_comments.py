@@ -10,23 +10,21 @@ User = get_user_model()
 
 
 @pytest.mark.django_db
-def test_add_comment_anonymous_user_returns_401():
+def test_add_comment_anonymous_user_returns_401(api_client):
     article = baker.make(models.Article)
 
-    client = APIClient()
-    response = client.post(f"/api/articles/{article.slug}/comments/")
+    response = api_client.post(f"/api/articles/{article.slug}/comments/")
 
     response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.django_db
-def test_add_comment_authenticated_invalid_data_returns_400():
+def test_add_comment_authenticated_invalid_data_returns_400(api_client):
     article = baker.make(models.Article)
     user = baker.make(User)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
-    response = client.post(
+    api_client.force_authenticate(user=user)
+    response = api_client.post(
         f"/api/articles/{article.slug}/comments/",
         {"body": ""},
     )
@@ -35,13 +33,12 @@ def test_add_comment_authenticated_invalid_data_returns_400():
 
 
 @pytest.mark.django_db
-def test_add_comment_authenticated_valid_data_returns_201():
+def test_add_comment_authenticated_valid_data_returns_201(api_client):
     article = baker.make(models.Article)
     user = baker.make(User)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
-    response = client.post(
+    api_client.force_authenticate(user=user)
+    response = api_client.post(
         f"/api/articles/{article.slug}/comments/",
         {"body": "abc"},
     )
@@ -51,23 +48,21 @@ def test_add_comment_authenticated_valid_data_returns_201():
 
 
 @pytest.mark.django_db
-def test_get_comments_returns_200():
+def test_get_comments_returns_200(api_client):
     article = baker.make(models.Article)
     baker.make(models.Comment, _quantity=5, article=article)
 
-    client = APIClient()
-    response = client.get(f"/api/articles/{article.slug}/comments/")
+    response = api_client.get(f"/api/articles/{article.slug}/comments/")
 
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data) == 5
 
 
 @pytest.mark.django_db
-def test_delete_comment_anonymous_returns_401():
+def test_delete_comment_anonymous_returns_401(api_client):
     comment = baker.make(models.Comment)
 
-    client = APIClient()
-    response = client.delete(
+    response = api_client.delete(
         f"/api/articles/{comment.article.slug}/comments/{comment.id}/"
     )
 
@@ -75,13 +70,12 @@ def test_delete_comment_anonymous_returns_401():
 
 
 @pytest.mark.django_db
-def test_delete_comment_authenticated_user_returns_204():
+def test_delete_comment_authenticated_user_returns_204(api_client):
     comment = baker.make(models.Comment)
     user = baker.make(User)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
-    response = client.delete(
+    api_client.force_authenticate(user=user)
+    response = api_client.delete(
         f"/api/articles/{comment.article.slug}/comments/{comment.id}/"
     )
 
