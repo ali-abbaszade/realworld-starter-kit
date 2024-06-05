@@ -78,38 +78,39 @@ def test_get_single_article_returns_200(api_client):
 
 
 @pytest.mark.django_db
-def test_create_article_anonymous_user_returns_401(api_client):
+def test_create_article_anonymous_user_returns_401(api_client, create_article):
     user = User.objects.create()
 
-    response = api_client.post(
-        "/api/articles/",
-        {"title": "a", "slug": "a", "body": "a", "tags": ["a"], "author": user},
+    response = create_article(
+        {"title": "a", "slug": "a", "body": "a", "tags": ["a"], "author": user}
     )
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.django_db
-def test_create_article_authenticated_user_invalid_data_returns_400(api_client):
+def test_create_article_authenticated_user_invalid_data_returns_400(
+    api_client, create_article
+):
     user = User.objects.create()
 
     api_client.force_authenticate(user=user)
-    response = api_client.post(
-        "/api/articles/",
-        {"title": "", "slug": "", "body": "", "tags": [], "author": user},
+    response = create_article(
+        {"title": "", "slug": "", "body": "", "tags": [], "author": user}
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
-def test_create_article_authenticated_user_valid_data_returns_201(api_client):
+def test_create_article_authenticated_user_valid_data_returns_201(
+    api_client, create_article
+):
     user = User.objects.create()
 
     api_client.force_authenticate(user=user)
-    response = api_client.post(
-        "/api/articles/",
-        {"title": "a", "slug": "a", "body": "a", "tags": ["a"], "author": user},
+    response = create_article(
+        {"title": "a", "slug": "a", "body": "a", "tags": ["a"], "author": user}
     )
 
     assert response.status_code == status.HTTP_201_CREATED
@@ -117,34 +118,36 @@ def test_create_article_authenticated_user_valid_data_returns_201(api_client):
 
 
 @pytest.mark.django_db
-def test_update_article_anonymous_user_returns_401(api_client):
+def test_update_article_anonymous_user_returns_401(update_article):
     article = baker.make(models.Article)
 
-    response = api_client.put(f"/api/articles/{article.slug}/")
+    response = update_article(article, {"title": "a"})
 
     response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.django_db
-def test_update_article_authenticate_user_invalid_data_returns_400(api_client):
+def test_update_article_authenticate_user_invalid_data_returns_400(
+    api_client, update_article
+):
     user = baker.make(User)
     article = baker.make(models.Article)
 
     api_client.force_authenticate(user=user)
-    response = api_client.put(f"/api/articles/{article.slug}/", {"title": ""})
+    response = update_article(article, {"title": ""})
 
     response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
-def test_update_article_authenticate_user_valid_data_returns_200(api_client):
+def test_update_article_authenticate_user_valid_data_returns_200(
+    api_client, update_article
+):
     user = baker.make(User)
     article = baker.make(models.Article)
 
     api_client.force_authenticate(user=user)
-    response = api_client.put(
-        f"/api/articles/{article.slug}/", {"title": "a", "body": "abc", "tags": ["a"]}
-    )
+    response = update_article(article, {"title": "a", "body": "abc", "tags": ["a"]})
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data["title"] == "a"
